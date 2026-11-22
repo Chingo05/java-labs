@@ -1,0 +1,2753 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwNTkxMzMwNzQyOTk5OTYxNTQwNyIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjX2ZlZTFiNWVmNzI1OWZmNWJfamF2YV9sYWJfNl83Lmh0bWwtODY5In0sImV4cCI6MTc5NTM1NjIxOCwiaWF0IjoxNzk1MzUyNjE4LCJhbGciOiJSUzI1NiJ9.X8b0S3v1nFH4xSzvPNOlHSGYeuXKmr8kvq66MqjxL7WLSPud0dLFEeJEoBWM1m9BeHobKNYOFS8WQsrsR_AB_K3o-387Xz5RbY8IH8jcaHkssia9iZWS2pz4sdL8xq2-KDyHLE1URsKcbXjfTAjLNF3COmiJd-H1vAu7LsYX2kDi2ZNRDK1ObUuKmxXBFkAC6bKDfGnn-OdzdXWSINSW67qp6KDaWStf4pZOpItVmez79wIiP-UqH8g_QBTXEWULwRCqHgw2KacB_mbSbeDPftEgAt4EAYETkHdpHbV6iMZjJY4L_xut_mwNM9z01kwI9iNVv0rcyUp13OBaxF4Rtg","c_fee1b5ef7259ff5b_java_lab_6_7.html-869")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №6–7: Циклы while, do-while, for и Random в Java</title>
+    <style>
+        /* =========================================================
+           1. ДИЗАЙН-ТОКЕНЫ И ТЕМЫ (СВЕТЛАЯ / ТЕМНАЯ, БЕЗ CDN)
+           ========================================================= */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --bg-code: #0f172a;
+            --bg-header: rgba(255, 255, 255, 0.94);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-code: #e2e8f0;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
+            --accent-soft: #eef2ff;
+            --accent-text: #4338ca;
+            --purple: #7c3aed;
+            --purple-soft: #f5f3ff;
+            --emerald: #059669;
+            --emerald-soft: #ecfdf5;
+            --amber: #d97706;
+            --amber-soft: #fffbeb;
+            --rose: #e11d48;
+            --rose-soft: #fff1f2;
+            --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        html.dark {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-subtle: #1e293b;
+            --bg-code: #020617;
+            --bg-header: rgba(15, 23, 42, 0.94);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-code: #e2e8f0;
+            --border: #1e293b;
+            --border-strong: #334155;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-soft: rgba(99, 102, 241, 0.16);
+            --accent-text: #a5b4fc;
+            --purple: #a78bfa;
+            --purple-soft: rgba(139, 92, 246, 0.16);
+            --emerald: #34d399;
+            --emerald-soft: rgba(16, 185, 129, 0.14);
+            --amber: #fbbf24;
+            --amber-soft: rgba(245, 158, 11, 0.14);
+            --rose: #fb7185;
+            --rose-soft: rgba(244, 63, 94, 0.15);
+            --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.55;
+            min-height: 100vh;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background: var(--accent-soft);
+            color: var(--accent-text);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        pre code { background: transparent; color: inherit; padding: 0; }
+
+        .hidden { display: none !important; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+        /* =========================================================
+           2. ШАПКА И НАВИГАЦИЯ (МОБИЛЬНЫЙ ФИКС: STATIC НА <768PX)
+           ========================================================= */
+        #main-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--bg-header);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            #main-header { position: static !important; }
+        }
+
+        .header-inner { padding: 14px 0 10px; display: flex; flex-direction: column; gap: 12px; }
+        .header-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+
+        .brand { display: flex; align-items: flex-start; gap: 12px; min-width: 0; flex: 1; }
+        .brand-logo {
+            width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed, #f59e0b);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 22px; font-weight: 800;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.3);
+        }
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+        .badge {
+            font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+            border: 1px solid var(--border-strong);
+        }
+        .badge-indigo { background: var(--accent-soft); color: var(--accent-text); border-color: rgba(99,102,241,0.35); }
+        .badge-emerald { background: var(--emerald-soft); color: var(--emerald); border-color: rgba(16,185,129,0.35); }
+        .badge-purple { background: var(--purple-soft); color: var(--purple); border-color: rgba(139,92,246,0.35); }
+        .badge-amber { background: var(--amber-soft); color: var(--amber); border-color: rgba(245,158,11,0.35); }
+
+        .header-title { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.25; }
+
+        .header-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 9px 14px; border-radius: 11px; font-size: 13px; font-weight: 600;
+            border: 1px solid transparent; cursor: pointer; transition: 0.15s ease;
+            font-family: var(--font-sans); color: var(--text-main); background: var(--bg-subtle);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,0.25); }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-emerald { background: #059669; color: #fff; }
+        .btn-emerald:hover { background: #047857; }
+        .btn-purple { background: #7c3aed; color: #fff; }
+        .btn-purple:hover { background: #6d28d9; }
+        .btn-amber { background: #d97706; color: #fff; }
+        .btn-amber:hover { background: #b45309; }
+        .btn-rose { background: #e11d48; color: #fff; }
+        .btn-outline { background: var(--bg-subtle); border-color: var(--border-strong); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--accent); }
+        .btn-sm { padding: 6px 11px; font-size: 12px; border-radius: 9px; }
+
+        .lang-switch {
+            display: inline-flex; background: var(--bg-subtle); padding: 3px;
+            border-radius: 11px; border: 1px solid var(--border-strong);
+        }
+        .lang-btn {
+            padding: 5px 10px; border-radius: 8px; border: none; background: transparent;
+            color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+        .lang-btn.active { background: var(--accent); color: #fff; }
+
+        .tabs-nav {
+            display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;
+            padding: 10px 0 4px; border-top: 1px solid var(--border);
+            scrollbar-width: thin;
+        }
+        .tab-btn {
+            padding: 8px 14px; border-radius: 11px; border: 1px solid transparent;
+            background: var(--bg-subtle); color: var(--text-muted);
+            font-size: 13px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+            transition: 0.15s;
+        }
+        .tab-btn:hover { color: var(--text-main); border-color: var(--border-strong); }
+        .tab-btn.active { background: var(--accent); color: #fff; box-shadow: 0 3px 10px rgba(79,70,229,0.28); }
+
+        /* =========================================================
+           3. СЕКЦИИ, КАРТОЧКИ, СЕТКИ, КОНСОЛИ
+           ========================================================= */
+        main { padding: 24px 0 48px; }
+        .tab-content { display: flex; flex-direction: column; gap: 22px; }
+
+        .hero-banner {
+            padding: 22px; border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--accent-soft), var(--purple-soft));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .hero-banner h2 { font-size: 1.5rem; font-weight: 800; margin: 8px 0 6px; line-height: 1.25; }
+        .hero-banner p { font-size: 0.92rem; color: var(--text-muted); max-width: 820px; }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+        }
+        .card-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+        }
+        .step-num {
+            width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 15px;
+            background: var(--accent-soft); color: var(--accent-text);
+        }
+        .card h3 { font-size: 1.15rem; font-weight: 800; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .grid-12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; }
+        .col-7 { grid-column: span 7; }
+        .col-5 { grid-column: span 5; }
+        .col-6 { grid-column: span 6; }
+
+        @media (max-width: 900px) {
+            .grid-2, .grid-12 { grid-template-columns: 1fr; }
+            .col-7, .col-5, .col-6 { grid-column: span 1; }
+        }
+
+        .callout {
+            padding: 14px 16px; border-radius: 12px; font-size: 0.88rem;
+            border: 1px solid var(--border-strong); background: var(--bg-subtle);
+            margin-top: 12px;
+        }
+        .callout-rose { background: var(--rose-soft); border-color: rgba(225,29,72,0.35); }
+        .callout-amber { background: var(--amber-soft); border-color: rgba(217,119,6,0.35); }
+        .callout-emerald { background: var(--emerald-soft); border-color: rgba(5,150,105,0.35); }
+        .callout-title { font-weight: 700; margin-bottom: 4px; display: block; }
+
+        .code-wrap { position: relative; margin-top: 10px; }
+        .code-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 6px; font-size: 12px; color: var(--text-muted); font-weight: 600;
+        }
+        pre.code-block, pre.console-box {
+            background: var(--bg-code); color: var(--text-code);
+            padding: 14px 16px; border-radius: 12px;
+            font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55;
+            overflow-x: auto; border: 1px solid var(--border-strong);
+            white-space: pre;
+        }
+        pre.console-box { color: #34d399; white-space: pre-wrap; word-break: break-word; min-height: 110px; }
+
+        .sim-box {
+            background: var(--bg-subtle); border: 1px solid var(--border-strong);
+            border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .sim-title {
+            font-size: 12px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.04em; color: var(--accent-text);
+        }
+
+        .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+        .field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+        .field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .input, .textarea, .select {
+            width: 100%; padding: 9px 12px; border-radius: 10px;
+            background: var(--bg-card); color: var(--text-main);
+            border: 1px solid var(--border-strong); font-family: var(--font-sans); font-size: 13px;
+            outline: none;
+        }
+        .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
+        .input-mono { font-family: var(--font-mono); font-weight: 600; }
+
+        ul.nice-list, ol.nice-list { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; color: var(--text-muted); }
+        ul.nice-list strong, ol.nice-list strong { color: var(--text-main); }
+
+        /* Прогресс-бар копилки */
+        .progress-track {
+            width: 100%; height: 12px; background: var(--bg-card);
+            border-radius: 999px; overflow: hidden; border: 1px solid var(--border-strong);
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #4f46e5, #10b981);
+            transition: width 0.3s ease;
+        }
+
+        /* Ракетный дисплей */
+        .rocket-stage {
+            text-align: center; padding: 18px; border-radius: 12px;
+            background: #020617; color: #f8fafc; border: 1px solid #334155;
+            font-family: var(--font-mono);
+        }
+        .rocket-num { font-size: 2.2rem; font-weight: 800; color: #fbbf24; margin: 6px 0; }
+
+        /* Таблица кубиков */
+        .dice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; }
+        .dice-item {
+            padding: 8px 10px; border-radius: 10px; background: var(--bg-card);
+            border: 1px solid var(--border-strong); font-family: var(--font-mono); font-size: 12px;
+        }
+        .dice-item.double { border-color: #10b981; background: var(--emerald-soft); }
+
+        /* =========================================================
+           4. ИТОГОВЫЙ ТЕСТ (20 ВОПРОСОВ)
+           ========================================================= */
+        .quiz-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .quiz-card.q-correct { border-color: #10b981; }
+        .quiz-card.q-wrong { border-color: #e11d48; }
+        .quiz-q { font-weight: 700; font-size: 0.95rem; }
+        .quiz-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        @media (max-width: 640px) { .quiz-opts { grid-template-columns: 1fr; } }
+
+        .quiz-opt {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            border-radius: 10px; border: 1px solid var(--border-strong);
+            background: var(--bg-subtle); cursor: pointer; font-size: 13px; transition: 0.15s;
+        }
+        .quiz-opt:hover { border-color: var(--accent); }
+        .quiz-opt input { accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; }
+        .quiz-opt.opt-right { background: var(--emerald-soft); border-color: #10b981; font-weight: 600; }
+        .quiz-opt.opt-wrong { background: var(--rose-soft); border-color: #e11d48; }
+
+        /* =========================================================
+           5. TOAST, ФУТЕР И ПЕЧАТЬ / PDF (IPHONE SAFARI)
+           ========================================================= */
+        #toast {
+            position: fixed; bottom: 20px; right: 20px; z-index: 60;
+            background: #4f46e5; color: #fff; padding: 12px 18px; border-radius: 12px;
+            font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(100px); opacity: 0; transition: 0.25s ease;
+            pointer-events: none; max-width: 90vw;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        footer {
+            text-align: center; padding: 24px 16px; font-size: 12px;
+            color: var(--text-muted); border-top: 1px solid var(--border);
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            .tab-content { display: none !important; }
+            #tab-report { display: block !important; }
+            #print-report-sheet {
+                border: none !important; box-shadow: none !important;
+                background: #fff !important; color: #000 !important; padding: 0 !important;
+            }
+            .input, .textarea { border: 1px solid #94a3b8 !important; color: #000 !important; background: #fff !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Уведомление Toast -->
+    <div id="toast">Готово!</div>
+
+    <!-- Шапка -->
+    <header id="main-header" class="no-print">
+        <div class="container header-inner">
+            <div class="header-top">
+                <div class="brand">
+                    <div class="brand-logo">☕</div>
+                    <div style="min-width:0;">
+                        <div class="badges">
+                            <span class="badge badge-indigo">
+                                <span class="lang-ru">Пара 6 + Пара 7 (4 ак. ч)</span>
+                                <span class="lang-kz hidden">6-жұп + 7-жұп (4 ак. сағ)</span>
+                            </span>
+                            <span class="badge badge-emerald">
+                                <span class="lang-ru">Индивидуально • Java</span>
+                                <span class="lang-kz hidden">Жеке жұмыс • Java</span>
+                            </span>
+                        </div>
+                        <h1 class="header-title">
+                            <span class="lang-ru">Лабораторная работа №6–7: Циклы <code>while</code>, <code>do-while</code>, <code>for</code> и <code>Random</code></span>
+                            <span class="lang-kz hidden">№6–7 Зертханалық жұмыс: <code>while</code>, <code>do-while</code>, <code>for</code> циклдері және <code>Random</code></span>
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="header-controls">
+                    <button class="btn btn-primary btn-sm" onclick="downloadThisHtml()">
+                        ⬇️ <span class="lang-ru">Скачать .html</span><span class="lang-kz hidden">Жүктеу .html</span>
+                    </button>
+                    <div class="lang-switch">
+                        <button id="lang-btn-ru" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+                        <button id="lang-btn-kz" class="lang-btn" onclick="setLanguage('kz')">KZ</button>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="theme-btn" onclick="toggleTheme()" title="Сменить тему / Тақырыпты ауыстыру">☀️</button>
+                </div>
+            </div>
+
+            <!-- Вкладки -->
+            <nav class="tabs-nav">
+                <button id="btn-tab-lecture" class="tab-btn active" onclick="switchTab('tab-lecture')">
+                    📖 <span class="lang-ru">1. Полная лекция</span><span class="lang-kz hidden">1. Толық дәріс</span>
+                </button>
+                <button id="btn-tab-pair6" class="tab-btn" onclick="switchTab('tab-pair6')">
+                    🔁 <span class="lang-ru">2. Пара 6: while и do-while</span><span class="lang-kz hidden">2. 6-жұп: while және do-while</span>
+                </button>
+                <button id="btn-tab-pair7" class="tab-btn" onclick="switchTab('tab-pair7')">
+                    🎲 <span class="lang-ru">3. Пара 7: for и Random</span><span class="lang-kz hidden">3. 7-жұп: for және Random</span>
+                </button>
+                <button id="btn-tab-test" class="tab-btn" onclick="switchTab('tab-test')">
+                    📝 <span class="lang-ru">4. Итоговый тест (20)</span><span class="lang-kz hidden">4. Қорытынды тест (20)</span>
+                </button>
+                <button id="btn-tab-report" class="tab-btn" onclick="switchTab('tab-report')">
+                    📄 <span class="lang-ru">5. Отчет и Сдача</span><span class="lang-kz hidden">5. Есеп және Тапсыру</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- ==========================================================
+             ВКЛАДКА 1: ПОЛНАЯ ЛЕКЦИЯ
+             ========================================================== -->
+        <section id="tab-lecture" class="tab-content">
+            <div class="hero-banner">
+                <span class="badge badge-indigo">
+                    <span class="lang-ru">Теория • Пары 6 и 7</span>
+                    <span class="lang-kz hidden">Теория • 6 және 7-жұптар</span>
+                </span>
+                <h2>
+                    <span class="lang-ru">Циклы в Java: автоматизируем повторения и добавляем случайность</span>
+                    <span class="lang-kz hidden">Java-дағы циклдер: қайталауларды автоматтандыру және кездейсоқтық</span>
+                </h2>
+                <p>
+                    <span class="lang-ru">Узнайте, чем отличается <code>while</code> от <code>do-while</code>, как не попасть в бесконечный цикл, почему <code>for</code> идеален для четкого счета и как бросать кубики через <code>Random</code>.</span>
+                    <span class="lang-kz hidden"><code>while</code> мен <code>do-while</code> айырмашылығын, шексіз циклге түспеу жолын, <code>for</code> циклінің ерекшелігін және <code>Random</code> арқылы кездейсоқ сан алуды меңгеріңіз.</span>
+                </p>
+            </div>
+
+            <!-- Блок 1: while и do-while -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-num">1</div>
+                    <h3>
+                        <span class="lang-ru">Циклы <code>while</code> и <code>do-while</code>: аналогия «Качаем пресс до усталости»</span>
+                        <span class="lang-kz hidden"><code>while</code> және <code>do-while</code> циклдері: «Шаршағанша пресс жасау» аналогиясы</span>
+                    </h3>
+                </div>
+                <div class="grid-12">
+                    <div class="col-6">
+                        <p class="lang-ru" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:10px;">
+                            Цикл <code>while</code> (с <strong>предусловием</strong>) сначала проверяет условие, и только если оно истинно (<code>true</code>), выполняет тело цикла. Представьте тренировку: пока остались силы (<code>energy &gt; 0</code>), вы делаете повтор и тратите 1 единицу энергии (<code>energy--</code>). Если сил изначально <code>0</code> — вы не сделаете ни одного повтора.
+                        </p>
+                        <p class="lang-kz hidden" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:10px;">
+                            <code>while</code> циклі (<strong>алғышартты</strong>) алдымен шартты тексереді, тек ол ақиқат (<code>true</code>) болса ғана орындалады. Жаттығуды елестетіңіз: күш бар кезде (<code>energy &gt; 0</code>) қайталау жасап, 1 бірлік энергия азайтасыз (<code>energy--</code>). Егер күш басынан <code>0</code> болса — цикл бір рет те орындалмайды.
+                        </p>
+                        <p class="lang-ru" style="font-size:0.92rem; color:var(--text-muted);">
+                            Цикл <code>do-while</code> (с <strong>постусловием</strong>) сначала выполняет действие, а проверяет условие в самом конце. Поэтому он гарантированно сработает <strong>хотя бы 1 раз</strong> (удобно для меню или запроса ввода).
+                        </p>
+                        <p class="lang-kz hidden" style="font-size:0.92rem; color:var(--text-muted);">
+                            <code>do-while</code> циклі (<strong>соңғы шартты</strong>) алдымен әрекетті орындап, шартты ең соңында тексереді. Сондықтан ол <strong>кем дегенде 1 рет</strong> міндетті түрде орындалады.
+                        </p>
+
+                        <div class="callout callout-rose">
+                            <span class="callout-title">⚠️ <span class="lang-ru">Ловушка бесконечного цикла (Infinite Loop)</span><span class="lang-kz hidden">Шексіз цикл тұзағы (Infinite Loop)</span></span>
+                            <span class="lang-ru">Если внутри <code>while (energy &gt; 0)</code> забыть написать <code>energy--</code>, условие никогда не станет <code>false</code> — программа зависнет навсегда! Для управления циклом также используют <code>break</code> (мгновенный выход из цикла) и <code>continue</code> (пропуск текущей итерации и переход к следующей).</span>
+                            <span class="lang-kz hidden">Егер <code>while (energy &gt; 0)</code> ішінде <code>energy--</code> жазуды ұмытсаңыз, шарт ешқашан <code>false</code> болмайды — бағдарлама мәңгілікке қатып қалады! Циклді басқару үшін <code>break</code> (циклден бірден шығу) және <code>continue</code> (ағымдағы қадамды өткізіп жіберу) қолданылады.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>WhileDemo.java</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('lec-while-code')">📋 <span class="lang-ru">Копировать</span><span class="lang-kz hidden">Көшіру</span></button>
+                            </div>
+                            <pre id="lec-while-code" class="code-block">int energy = 3;
+
+// Цикл while (предусловие)
+while (energy &gt; 0) {
+    System.out.println("Делаем повтор! Сил: " + energy);
+    energy--; // Важно! Без этого будет бесконечный цикл
+}
+System.out.println("Тренировка окончена!");
+
+// Цикл do-while (выполнится минимум 1 раз)
+int x = 0;
+do {
+    System.out.println("Сработал хотя бы раз! x = " + x);
+} while (x &gt; 0);</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок 2: for и Random -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-num">2</div>
+                    <h3>
+                        <span class="lang-ru">Цикл <code>for</code> («Школьный стадион») и генератор <code>Random</code></span>
+                        <span class="lang-kz hidden"><code>for</code> циклі («Мектеп стадионы») және <code>Random</code> генераторы</span>
+                    </h3>
+                </div>
+                <div class="grid-12">
+                    <div class="col-6">
+                        <p class="lang-ru" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:10px;">
+                            Когда заранее известно точное число повторений, используют <code>for (int i = 1; i &lt;= 5; i++)</code>. Аналогия <strong>«Школьный стадион»</strong>: физрук четко сказал пробежать ровно 5 кругов — вы начинаете с 1-го (<code>int i = 1</code>), бежите пока <code>i &lt;= 5</code>, и после каждого круга счетчик сам растет на единицу (<code>i++</code>).
+                        </p>
+                        <p class="lang-kz hidden" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:10px;">
+                            Қайталау саны алдын ала нақты белгілі болса, <code>for (int i = 1; i &lt;= 5; i++)</code> қолданылады. <strong>«Мектеп стадионы»</strong> аналогиясы: дене шынықтыру мұғалімі дәл 5 айналым жүгіруді тапсырды — 1-ден бастайсыз (<code>int i = 1</code>), <code>i &lt;= 5</code> болғанша жүгіресіз, әр айналымда есептегіш өседі (<code>i++</code>).
+                        </p>
+
+                        <div class="callout callout-amber">
+                            <span class="callout-title">🎲 <span class="lang-ru">Как работает <code>java.util.Random</code>?</span><span class="lang-kz hidden"><code>java.util.Random</code> қалай жұмыс істейді?</span></span>
+                            <span class="lang-ru">Метод <code>rand.nextInt(N)</code> всегда выдает целое число от <strong>0 до N - 1</strong> (включая 0, но НЕ включая N). Поэтому <code>rand.nextInt(6)</code> даст <code>0, 1, 2, 3, 4, 5</code>. Чтобы получить грани кубика от 1 до 6, нужно просто прибавить 1: <code>int dice = rand.nextInt(6) + 1;</code>.</span>
+                            <span class="lang-kz hidden"><code>rand.nextInt(N)</code> әдісі әрқашан <strong>0-ден N - 1-ге дейін</strong> бүтін сан береді (N саны кірмейді). Сондықтан <code>rand.nextInt(6)</code> нәтижесі <code>0..5</code> болады. Сүйектің 1-ден 6-ға дейінгі мәнін алу үшін 1 қосамыз: <code>int dice = rand.nextInt(6) + 1;</code>.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>ForAndRandom.java</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('lec-for-code')">📋 <span class="lang-ru">Копировать</span><span class="lang-kz hidden">Көшіру</span></button>
+                            </div>
+                            <pre id="lec-for-code" class="code-block">import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+        Random rand = new Random();
+
+        for (int i = 1; i &lt;= 5; i++) {
+            int dice = rand.nextInt(6) + 1; // от 1 до 6
+            System.out.println("Круг #" + i + " | Выпало: " + dice);
+        }
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок 3: Интерактивный пошаговый симулятор цикла (while vs for) -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-num">3</div>
+                    <h3>
+                        <span class="lang-ru">Интерактивный стенд: пошаговый симулятор цикла (<code>while</code> vs <code>for</code>)</span>
+                        <span class="lang-kz hidden">Интерактивті стенд: циклдің қадамдық симуляторы (<code>while</code> vs <code>for</code>)</span>
+                    </h3>
+                </div>
+                <div class="sim-box">
+                    <div class="form-row">
+                        <div class="field">
+                            <label><span class="lang-ru">Тип цикла:</span><span class="lang-kz hidden">Цикл типі:</span></label>
+                            <select id="step-type" class="select" onchange="resetStepSim()">
+                                <option value="for">for (int i = 1; i &lt;= N; i++)</option>
+                                <option value="while">while (energy &gt; 0) { energy--; }</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label><span class="lang-ru">Значение N / energy (1–8):</span><span class="lang-kz hidden">N / energy мәні (1–8):</span></label>
+                            <input type="number" id="step-max" class="input input-mono" value="4" min="1" max="8" onchange="resetStepSim()">
+                        </div>
+                        <button class="btn btn-primary" onclick="nextLoopStep()">▶️ <span class="lang-ru">Следующий шаг</span><span class="lang-kz hidden">Келесі қадам</span></button>
+                        <button class="btn btn-outline" onclick="resetStepSim()">🔄 <span class="lang-ru">Сброс</span><span class="lang-kz hidden">Тазарту</span></button>
+                    </div>
+                    <pre id="step-output" class="console-box">&gt; Нажмите «Следующий шаг», чтобы прогнать цикл пошагово...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             ВКЛАДКА 2: ПАРА 6 — WHILE И DO-WHILE
+             ========================================================== -->
+        <section id="tab-pair6" class="tab-content hidden">
+            <div class="hero-banner">
+                <span class="badge badge-indigo"><span class="lang-ru">Пара 6 (2 ак. ч) • Индивидуальная практика</span><span class="lang-kz hidden">6-жұп (2 ак. сағ) • Жеке практика</span></span>
+                <h2><span class="lang-ru">Циклы <code>while</code> и <code>do-while</code> на практике</span><span class="lang-kz hidden"><code>while</code> және <code>do-while</code> циклдері практикада</span></h2>
+                <p><span class="lang-ru">Выполните обе задачи самостоятельно в IDE и проверьте логику на встроенных тренажерах ниже.</span><span class="lang-kz hidden">Екі тапсырманы IDE-де өз бетінше орындап, төмендегі тренажерлерде тексеріңіз.</span></p>
+            </div>
+
+            <!-- Задача 6.1 -->
+            <div class="card">
+                <div class="badges" style="margin-bottom:8px;">
+                    <span class="badge badge-indigo"><span class="lang-ru">Задача 6.1</span><span class="lang-kz hidden">6.1-есеп</span></span>
+                </div>
+                <h3 style="margin-bottom:12px;">
+                    🔐 <span class="lang-ru">«Тренажер пин-кода с 3 попытками и Копилка (10 000 тг)»</span>
+                    <span class="lang-kz hidden">«3 әрекетті ПИН-код тренажері және Жинақ сандығы (10 000 тг)»</span>
+                </h3>
+                <div class="grid-12">
+                    <div class="col-7">
+                        <ol class="nice-list">
+                            <li><span class="lang-ru">Создайте класс <code>PinAndPiggyBank</code>. Задайте верный ПИН <code>int correctPin = 7777;</code> и счетчик попыток <code>int attempts = 0;</code>.</span><span class="lang-kz hidden"><code>PinAndPiggyBank</code> класын құрыңыз. Дұрыс ПИН <code>int correctPin = 7777;</code> және әрекет санағышын <code>int attempts = 0;</code> беріңіз.</span></li>
+                            <li><span class="lang-ru">В цикле <code>while (attempts &lt; 3)</code> запрашивайте ПИН через <code>Scanner</code>. Если ПИН верный — выходите через <code>break</code>. Если 3 раза неверно — выведите «Карта заблокирована!» и завершите программу.</span><span class="lang-kz hidden"><code>while (attempts &lt; 3)</code> циклінде <code>Scanner</code> арқылы ПИН сұраңыз. Дұрыс болса <code>break</code> арқылы шығыңыз. 3 рет қате болса «Карта бұғатталды!» деп аяқтаңыз.</span></li>
+                            <li><span class="lang-ru">После успешного входа запустите <strong>Копилку</strong>: в цикле <code>while (saved &lt; 10000)</code> пользователь вводит взносы в тенге, пока сумма не достигнет или не превысит <code>10 000</code> тг. В конце выведите итоговую накопленную сумму.</span><span class="lang-kz hidden">Сәтті кіргеннен кейін <strong>Жинақ сандығын</strong> іске қосыңыз: <code>while (saved &lt; 10000)</code> циклінде сома <code>10 000</code> тг-ге жеткенше жарна енгізіп отырыңыз.</span></li>
+                        </ol>
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>PinAndPiggyBank.java (Каркас)</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('code-task6-1')">📋 Copy</button>
+                            </div>
+                            <pre id="code-task6-1" class="code-block">import java.util.Scanner;
+
+public class PinAndPiggyBank {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int correctPin = 7777, attempts = 0;
+        boolean access = false;
+
+        while (attempts &lt; 3) {
+            System.out.print("Введите ПИН-код: ");
+            int pin = sc.nextInt();
+            attempts++;
+            if (pin == correctPin) {
+                access = true;
+                break;
+            }
+            System.out.println("Неверно! Осталось попыток: " + (3 - attempts));
+        }
+
+        if (!access) {
+            System.out.println("Карта заблокирована!");
+            return;
+        }
+
+        int saved = 0;
+        while (saved &lt; 10000) {
+            System.out.print("Внесите сумму (тг): ");
+            saved += sc.nextInt();
+            System.out.println("Накоплено: " + saved + " / 10000 тг");
+        }
+        System.out.println("Цель достигнута! Итого: " + saved + " тг");
+    }
+}</pre>
+                        </div>
+                    </div>
+
+                    <!-- Интерактивный симулятор 6.1 -->
+                    <div class="col-5">
+                        <div class="sim-box">
+                            <div class="sim-title">🎮 <span class="lang-ru">Интерактивный симулятор (ПИН: 7777)</span><span class="lang-kz hidden">Интерактивті симулятор (ПИН: 7777)</span></div>
+
+                            <!-- Этап 1: ПИН -->
+                            <div id="sim61-pin-stage" style="display:flex; flex-direction:column; gap:8px;">
+                                <div class="form-row">
+                                    <div class="field">
+                                        <label><span class="lang-ru">Введите ПИН-код:</span><span class="lang-kz hidden">ПИН-код енгізіңіз:</span></label>
+                                        <input type="number" id="sim61-pin" class="input input-mono" placeholder="7777">
+                                    </div>
+                                    <button class="btn btn-primary" onclick="checkSimPin()"><span class="lang-ru">Войти</span><span class="lang-kz hidden">Кіру</span></button>
+                                </div>
+                            </div>
+
+                            <!-- Этап 2: Копилка -->
+                            <div id="sim61-bank-stage" class="hidden" style="display:flex; flex-direction:column; gap:8px;">
+                                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
+                                    <span><span class="lang-ru">Копилка:</span><span class="lang-kz hidden">Жинақ:</span></span>
+                                    <span id="sim61-bank-label">0 / 10 000 тг (0%)</span>
+                                </div>
+                                <div class="progress-track"><div id="sim61-progress" class="progress-fill" style="width: 0%;"></div></div>
+                                <div class="form-row">
+                                    <div class="field">
+                                        <label><span class="lang-ru">Взнос (тг):</span><span class="lang-kz hidden">Жарна (тг):</span></label>
+                                        <input type="number" id="sim61-deposit" class="input input-mono" value="2500" step="500">
+                                    </div>
+                                    <button class="btn btn-emerald" onclick="addPiggyDeposit()">+ <span class="lang-ru">Внести</span><span class="lang-kz hidden">Салу</span></button>
+                                </div>
+                            </div>
+
+                            <pre id="sim61-console" class="console-box">&gt; Введите ПИН-код (верный: 7777). Попробуйте ввести неверный 3 раза для проверки блокировки!</pre>
+                            <button class="btn btn-outline btn-sm" onclick="resetSim61()">🔄 <span class="lang-ru">Сбросить симулятор</span><span class="lang-kz hidden">Симуляторды тазарту</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Задача 6.2 -->
+            <div class="card">
+                <div class="badges" style="margin-bottom:8px;">
+                    <span class="badge badge-amber"><span class="lang-ru">Задача 6.2</span><span class="lang-kz hidden">6.2-есеп</span></span>
+                </div>
+                <h3 style="margin-bottom:12px;">
+                    🚀 <span class="lang-ru">«Таймер обратного отсчета ракеты»</span>
+                    <span class="lang-kz hidden">«Зымыранның кері санақ таймері»</span>
+                </h3>
+                <div class="grid-12">
+                    <div class="col-7">
+                        <p class="lang-ru" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">
+                            Напишите программу <code>RocketTimer</code>, которая с помощью цикла <code>while</code> выводит обратный отсчет от <code>10</code> до <code>1</code>, уменьшая счетчик на 1 на каждом шаге (<code>count--</code>), а сразу после выхода из цикла печатает <strong>«Поехали!»</strong>.
+                        </p>
+                        <p class="lang-kz hidden" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">
+                            <code>while</code> циклін пайдаланып <code>10</code>-нан <code>1</code>-ге дейін кері санақ шығаратын (<code>count--</code>), ал цикл аяқталған соң <strong>«Кеттік!»</strong> деп жазатын <code>RocketTimer</code> бағдарламасын жазыңыз.
+                        </p>
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>RocketTimer.java</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('code-task6-2')">📋 Copy</button>
+                            </div>
+                            <pre id="code-task6-2" class="code-block">public class RocketTimer {
+    public static void main(String[] args) {
+        int count = 10;
+        while (count &gt;= 1) {
+            System.out.println("До старта: " + count);
+            count--;
+        }
+        System.out.println("Поехали! 🚀");
+    }
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="sim-box">
+                            <div class="sim-title">🚀 <span class="lang-ru">Визуальный запуск ракеты</span><span class="lang-kz hidden">Зымыранды іске қосу</span></div>
+                            <div class="rocket-stage">
+                                <div id="rocket-icon" style="font-size:2.2rem;">🚀</div>
+                                <div id="rocket-num" class="rocket-num">10</div>
+                                <div id="rocket-status" style="font-size:12px; color:#94a3b8;">Ready for launch</div>
+                            </div>
+                            <button class="btn btn-amber" onclick="launchRocket()">🔥 <span class="lang-ru">Запустить отсчет (10 → 1)</span><span class="lang-kz hidden">Санақты бастау (10 → 1)</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             ВКЛАДКА 3: ПАРА 7 — FOR И RANDOM
+             ========================================================== -->
+        <section id="tab-pair7" class="tab-content hidden">
+            <div class="hero-banner">
+                <span class="badge badge-purple"><span class="lang-ru">Пара 7 (2 ак. ч) • Индивидуальная практика</span><span class="lang-kz hidden">7-жұп (2 ак. сағ) • Жеке практика</span></span>
+                <h2><span class="lang-ru">Цикл со счетчиком <code>for</code> и генератор <code>Random</code></span><span class="lang-kz hidden"><code>for</code> санағыш циклі және <code>Random</code> генераторы</span></h2>
+                <p><span class="lang-ru">Соберите генератор паролей, таблицу умножения и симулятор броска двух игральных кубиков.</span><span class="lang-kz hidden">Құпия сөз генераторын, көбейту кестесін және екі ойын сүйегінің симуляторын жасаңыз.</span></p>
+            </div>
+
+            <!-- Задача 7.1 -->
+            <div class="card">
+                <div class="badges" style="margin-bottom:8px;">
+                    <span class="badge badge-purple"><span class="lang-ru">Задача 7.1</span><span class="lang-kz hidden">7.1-есеп</span></span>
+                </div>
+                <h3 style="margin-bottom:12px;">
+                    🔑 <span class="lang-ru">«Генератор надежных паролей и таблица умножения»</span>
+                    <span class="lang-kz hidden">«Сенімді құпия сөз генераторы және көбейту кестесі»</span>
+                </h3>
+                <div class="grid-12">
+                    <div class="col-6">
+                        <ul class="nice-list">
+                            <li><span class="lang-ru"><strong>Часть 1 (Пароль):</strong> Запросите длину пароля <code>int len</code>. Создайте строку доступных символов <code>String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";</code>. В цикле <code>for (int i = 0; i &lt; len; i++)</code> берите случайный индекс <code>rand.nextInt(chars.length())</code> и добавляйте символ <code>chars.charAt(index)</code> к паролю.</span><span class="lang-kz hidden"><strong>1-бөлім (Құпия сөз):</strong> Ұзындығын <code>int len</code> сұраңыз. <code>for</code> циклінде <code>Random</code> арқылы кездейсоқ таңбаларды таңдап, құпия сөз құрастырыңыз.</span></li>
+                            <li><span class="lang-ru"><strong>Часть 2 (Таблица):</strong> Запросите число <code>int n</code> и в цикле <code>for (int i = 1; i &lt;= 10; i++)</code> выведите таблицу умножения: <code>n + " x " + i + " = " + (n * i)</code>.</span><span class="lang-kz hidden"><strong>2-бөлім (Кесте):</strong> <code>int n</code> санын сұрап, <code>for (int i = 1; i &lt;= 10; i++)</code> циклінде көбейту кестесін шығарыңыз.</span></li>
+                        </ul>
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>PasswordAndTable.java</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('code-task7-1')">📋 Copy</button>
+                            </div>
+                            <pre id="code-task7-1" class="code-block">import java.util.Random;
+import java.util.Scanner;
+
+public class PasswordAndTable {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Random rand = new Random();
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
+
+        System.out.print("Длина пароля: ");
+        int len = sc.nextInt();
+        String password = "";
+        for (int i = 0; i &lt; len; i++) {
+            int idx = rand.nextInt(chars.length());
+            password += chars.charAt(idx);
+        }
+        System.out.println("Ваш пароль: " + password);
+
+        System.out.print("Число для таблицы умножения: ");
+        int n = sc.nextInt();
+        for (int i = 1; i &lt;= 10; i++) {
+            System.out.println(n + " x " + i + " = " + (n * i));
+        }
+    }
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="sim-box">
+                            <div class="sim-title">⚡ <span class="lang-ru">Интерактивный тренажер (Пароль + Таблица)</span><span class="lang-kz hidden">Интерактивті тренажер (Құпия сөз + Кесте)</span></div>
+                            <div class="form-row">
+                                <div class="field">
+                                    <label><span class="lang-ru">Длина пароля (4–24):</span><span class="lang-kz hidden">Құпия сөз ұзындығы (4–24):</span></label>
+                                    <input type="number" id="pass-len" class="input input-mono" value="12" min="4" max="24">
+                                </div>
+                                <button class="btn btn-purple" onclick="generateSimPassword()">🔑 <span class="lang-ru">Сгенерировать</span><span class="lang-kz hidden">Генерациялау</span></button>
+                            </div>
+                            <pre id="pass-output" class="console-box" style="min-height:54px;">Password (12 chars): G$83kiMSma3W</pre>
+
+                            <div class="form-row" style="margin-top:6px;">
+                                <div class="field">
+                                    <label><span class="lang-ru">Число N для таблицы:</span><span class="lang-kz hidden">Кестеге арналған N саны:</span></label>
+                                    <input type="number" id="mult-n" class="input input-mono" value="7" oninput="updateMultTable()">
+                                </div>
+                            </div>
+                            <pre id="mult-output" class="console-box">7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63
+7 x 10 = 70</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Задача 7.2 -->
+            <div class="card">
+                <div class="badges" style="margin-bottom:8px;">
+                    <span class="badge badge-emerald"><span class="lang-ru">Задача 7.2</span><span class="lang-kz hidden">7.2-есеп</span></span>
+                </div>
+                <h3 style="margin-bottom:12px;">
+                    🎲 <span class="lang-ru">«Симулятор броска двух игральных кубиков (10 раз подряд)»</span>
+                    <span class="lang-kz hidden">«Екі ойын сүйегін лақтыру симуляторы (қатарынан 10 рет)»</span>
+                </h3>
+                <div class="grid-12">
+                    <div class="col-5">
+                        <p class="lang-ru" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">
+                            Напишите программу <code>DiceSimulator</code>. Цикл <code>for (int i = 1; i &lt;= 10; i++)</code> делает ровно 10 бросков двух кубиков: <code>int d1 = rand.nextInt(6) + 1;</code> и <code>int d2 = rand.nextInt(6) + 1;</code>. Выведите оба числа, их сумму, а если <code>d1 == d2</code> — увеличьте счетчик дублей <code>doublesCount++</code>. В конце выведите общее число дублей.
+                        </p>
+                        <p class="lang-kz hidden" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">
+                            <code>DiceSimulator</code> бағдарламасын жазыңыз. <code>for</code> циклі 10 рет екі сүйекті лақтырады (<code>rand.nextInt(6) + 1</code>), екі санды және олардың қосындысын шығарады. Егер <code>d1 == d2</code> болса, дубль санағышын арттырып, соңында жалпы дубль санын көрсетіңіз.
+                        </p>
+                        <div class="code-wrap">
+                            <div class="code-bar">
+                                <span>DiceSimulator.java</span>
+                                <button class="btn btn-outline btn-sm" onclick="copyCode('code-task7-2')">📋 Copy</button>
+                            </div>
+                            <pre id="code-task7-2" class="code-block">import java.util.Random;
+
+public class DiceSimulator {
+    public static void main(String[] args) {
+        Random rand = new Random();
+        int doubles = 0;
+
+        for (int i = 1; i &lt;= 10; i++) {
+            int d1 = rand.nextInt(6) + 1;
+            int d2 = rand.nextInt(6) + 1;
+            System.out.println("Бросок " + i + ": [" + d1 + "] и [" + d2 + "] | Сумма: " + (d1 + d2));
+            if (d1 == d2) {
+                doubles++;
+            }
+        }
+        System.out.println("Всего выпало дублей: " + doubles);
+    }
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="col-7">
+                        <div class="sim-box">
+                            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+                                <div class="sim-title">🎲 <span class="lang-ru">Симулятор 10 бросков</span><span class="lang-kz hidden">10 лақтыру симуляторы</span></div>
+                                <button class="btn btn-emerald btn-sm" onclick="rollDice10()">🎲 <span class="lang-ru">Бросить 10 раз!</span><span class="lang-kz hidden">10 рет лақтыру!</span></button>
+                            </div>
+                            <div id="dice-results" class="dice-grid"><div class="dice-item double">
+                    #1: ⚃[4] + ⚃[4] = <strong>8</strong> ✨
+                </div><div class="dice-item ">
+                    #2: ⚃[4] + ⚄[5] = <strong>9</strong> 
+                </div><div class="dice-item ">
+                    #3: ⚅[6] + ⚃[4] = <strong>10</strong> 
+                </div><div class="dice-item ">
+                    #4: ⚄[5] + ⚅[6] = <strong>11</strong> 
+                </div><div class="dice-item ">
+                    #5: ⚁[2] + ⚃[4] = <strong>6</strong> 
+                </div><div class="dice-item ">
+                    #6: ⚀[1] + ⚄[5] = <strong>6</strong> 
+                </div><div class="dice-item ">
+                    #7: ⚀[1] + ⚁[2] = <strong>3</strong> 
+                </div><div class="dice-item ">
+                    #8: ⚅[6] + ⚂[3] = <strong>9</strong> 
+                </div><div class="dice-item ">
+                    #9: ⚁[2] + ⚀[1] = <strong>3</strong> 
+                </div><div class="dice-item ">
+                    #10: ⚃[4] + ⚂[3] = <strong>7</strong> 
+                </div></div>
+                            <div id="dice-summary" class="callout callout-emerald" style="margin-top:0; font-weight:700;">Выполнено 10 бросков | Всего выпало дублей: 1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             ВКЛАДКА 4: ИТОГОВЫЙ ТЕСТ (20 ВОПРОСОВ)
+             ========================================================== -->
+        <section id="tab-test" class="tab-content hidden">
+            <div class="card" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+                <div>
+                    <h3>📝 <span class="lang-ru">Итоговый тест: 20 вопросов (Циклы и Random)</span><span class="lang-kz hidden">Қорытынды тест: 20 сұрақ (Циклдер және Random)</span></h3>
+                    <p style="font-size:0.86rem; color:var(--text-muted); margin-top:4px;">
+                        <span class="lang-ru">Внимательно читайте каждый вариант. Результат автоматически перенесется в отчет на вкладке 5.</span>
+                        <span class="lang-kz hidden">Әр нұсқаны мұқият оқыңыз. Нәтиже 5-бөлімдегі есепке автоматты түрде жазылады.</span>
+                    </p>
+                </div>
+                <div id="test-score-badge" class="badge badge-indigo" style="font-size:14px; padding:8px 14px;">
+                    <span class="lang-ru">Не завершен</span><span class="lang-kz hidden">Аяқталмаған</span>
+                </div>
+            </div>
+
+            <div id="quiz-container" style="display:flex; flex-direction:column; gap:14px;"><div class="quiz-card"><div class="quiz-q">1. Когда проверяется условие продолжения работы в цикле while?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_0" value="0" onchange="userAnswers[0] = 0">
+                            <span>Перед началом каждой итерации</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_0" value="1" onchange="userAnswers[0] = 1">
+                            <span>После завершения каждой итерации</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_0" value="2" onchange="userAnswers[0] = 2">
+                            <span>Только один раз в самом конце</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_0" value="3" onchange="userAnswers[0] = 3">
+                            <span>После выполнения оператора break</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">2. Чем цикл do-while принципиально отличается от обычного цикла while?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_1" value="0" onchange="userAnswers[1] = 0">
+                            <span>Он не поддерживает оператор break</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_1" value="1" onchange="userAnswers[1] = 1">
+                            <span>Он выполняется хотя бы один раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_1" value="2" onchange="userAnswers[1] = 2">
+                            <span>Он работает только со строками</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_1" value="3" onchange="userAnswers[1] = 3">
+                            <span>Он не требует условия в скобках</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">3. Что произойдет, если в цикле while (energy &gt; 0) забыть уменьшать переменную energy?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_2" value="0" onchange="userAnswers[2] = 0">
+                            <span>Цикл завершится после первого шага</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_2" value="1" onchange="userAnswers[2] = 1">
+                            <span>Компилятор выдаст ошибку синтаксиса</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_2" value="2" onchange="userAnswers[2] = 2">
+                            <span>Программа попадет в бесконечный цикл</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_2" value="3" onchange="userAnswers[2] = 3">
+                            <span>Переменная energy обнулится сама</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">4. Какой оператор немедленно прерывает выполнение цикла и выходит из него?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_3" value="0" onchange="userAnswers[3] = 0">
+                            <span>Оператор continue</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_3" value="1" onchange="userAnswers[3] = 1">
+                            <span>Оператор default</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_3" value="2" onchange="userAnswers[3] = 2">
+                            <span>Оператор switch</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_3" value="3" onchange="userAnswers[3] = 3">
+                            <span>Оператор break</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">5. Что делает оператор continue внутри тела цикла?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_4" value="0" onchange="userAnswers[4] = 0">
+                            <span>Пропускает остаток шага к следующему</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_4" value="1" onchange="userAnswers[4] = 1">
+                            <span>Полностью останавливает весь цикл</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_4" value="2" onchange="userAnswers[4] = 2">
+                            <span>Сбрасывает счетчик цикла в ноль</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_4" value="3" onchange="userAnswers[4] = 3">
+                            <span>Завершает работу метода main</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">6. Сколько раз выполнится цикл: for (int i = 1; i &lt;= 5; i++)?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_5" value="0" onchange="userAnswers[5] = 0">
+                            <span>Ровно 4 раза</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_5" value="1" onchange="userAnswers[5] = 1">
+                            <span>Ровно 5 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_5" value="2" onchange="userAnswers[5] = 2">
+                            <span>Ровно 6 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_5" value="3" onchange="userAnswers[5] = 3">
+                            <span>Ни одного раза</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">7. Сколько раз выполнится цикл: for (int i = 0; i &lt; 10; i++)?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_6" value="0" onchange="userAnswers[6] = 0">
+                            <span>Ровно 9 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_6" value="1" onchange="userAnswers[6] = 1">
+                            <span>Ровно 11 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_6" value="2" onchange="userAnswers[6] = 2">
+                            <span>Ровно 10 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_6" value="3" onchange="userAnswers[6] = 3">
+                            <span>Бесконечно много раз</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">8. Какой диапазон целых чисел возвращает метод rand.nextInt(6)?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_7" value="0" onchange="userAnswers[7] = 0">
+                            <span>От 1 до 6 включительно</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_7" value="1" onchange="userAnswers[7] = 1">
+                            <span>От 0 до 6 включительно</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_7" value="2" onchange="userAnswers[7] = 2">
+                            <span>От 1 до 5 включительно</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_7" value="3" onchange="userAnswers[7] = 3">
+                            <span>От 0 до 5 включительно</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">9. Как правильно получить случайное число от 1 до 6 (как на игральном кубике)?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_8" value="0" onchange="userAnswers[8] = 0">
+                            <span>rand.nextInt(6) + 1</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_8" value="1" onchange="userAnswers[8] = 1">
+                            <span>rand.nextInt(5) + 1</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_8" value="2" onchange="userAnswers[8] = 2">
+                            <span>rand.nextInt(7)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_8" value="3" onchange="userAnswers[8] = 3">
+                            <span>rand.nextInt(6) - 1</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">10. Какой пакет нужно импортировать в начале файла для работы с классом Random?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_9" value="0" onchange="userAnswers[9] = 0">
+                            <span>import java.io.Random;</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_9" value="1" onchange="userAnswers[9] = 1">
+                            <span>import java.util.Random;</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_9" value="2" onchange="userAnswers[9] = 2">
+                            <span>import java.lang.Random;</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_9" value="3" onchange="userAnswers[9] = 3">
+                            <span>import java.math.Random;</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">11. Что выведет код: int i = 3; while (i &gt; 0) { System.out.print(i); i--; }?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_10" value="0" onchange="userAnswers[10] = 0">
+                            <span>Числа 123</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_10" value="1" onchange="userAnswers[10] = 1">
+                            <span>Числа 3210</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_10" value="2" onchange="userAnswers[10] = 2">
+                            <span>Числа 321</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_10" value="3" onchange="userAnswers[10] = 3">
+                            <span>Числа 210</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">12. Сколько раз выполнится тело цикла: int x = 10; while (x &lt; 5) { x++; }?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_11" value="0" onchange="userAnswers[11] = 0">
+                            <span>Ровно 5 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_11" value="1" onchange="userAnswers[11] = 1">
+                            <span>Ровно 1 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_11" value="2" onchange="userAnswers[11] = 2">
+                            <span>Ровно 10 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_11" value="3" onchange="userAnswers[11] = 3">
+                            <span>Ноль раз (не запустится)</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">13. Сколько раз выполнится цикл: int x = 10; do { x++; } while (x &lt; 5);?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_12" value="0" onchange="userAnswers[12] = 0">
+                            <span>Ровно 1 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_12" value="1" onchange="userAnswers[12] = 1">
+                            <span>Ноль раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_12" value="2" onchange="userAnswers[12] = 2">
+                            <span>Ровно 5 раз</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_12" value="3" onchange="userAnswers[12] = 3">
+                            <span>Бесконечно раз</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">14. Что означает запись i += 2 в заголовке цикла for (int i = 0; i &lt;= 6; i += 2)?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_13" value="0" onchange="userAnswers[13] = 0">
+                            <span>Умножает i на 2 на каждом шаге</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_13" value="1" onchange="userAnswers[13] = 1">
+                            <span>Увеличивает i на 2 на каждом шаге</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_13" value="2" onchange="userAnswers[13] = 2">
+                            <span>Уменьшает i на 2 на каждом шаге</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_13" value="3" onchange="userAnswers[13] = 3">
+                            <span>Присваивает i число 2 один раз</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">15. В задаче о копилке: какое условие держит цикл открытым, пока не набрано 10 000 тг?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_14" value="0" onchange="userAnswers[14] = 0">
+                            <span>while (saved &gt; 10000)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_14" value="1" onchange="userAnswers[14] = 1">
+                            <span>while (saved == 10000)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_14" value="2" onchange="userAnswers[14] = 2">
+                            <span>while (saved &lt; 10000)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_14" value="3" onchange="userAnswers[14] = 3">
+                            <span>while (saved != 0)</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">16. В задаче о двух кубиках d1 и d2: какое условие проверяет, что выпал дубль?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_15" value="0" onchange="userAnswers[15] = 0">
+                            <span>if (d1 + d2 == 12)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_15" value="1" onchange="userAnswers[15] = 1">
+                            <span>if (d1 != d2)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_15" value="2" onchange="userAnswers[15] = 2">
+                            <span>if (d1 &gt; d2)</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_15" value="3" onchange="userAnswers[15] = 3">
+                            <span>if (d1 == d2)</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">17. Как получить случайное число от 10 до 20 включительно через Random?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_16" value="0" onchange="userAnswers[16] = 0">
+                            <span>rand.nextInt(11) + 10</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_16" value="1" onchange="userAnswers[16] = 1">
+                            <span>rand.nextInt(10) + 10</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_16" value="2" onchange="userAnswers[16] = 2">
+                            <span>rand.nextInt(20) + 10</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_16" value="3" onchange="userAnswers[16] = 3">
+                            <span>rand.nextInt(10) + 11</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">18. Чему будет равна сумма s после цикла: int s = 0; for (int i = 1; i &lt;= 4; i++) { s += i; }?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_17" value="0" onchange="userAnswers[17] = 0">
+                            <span>Числу 6</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_17" value="1" onchange="userAnswers[17] = 1">
+                            <span>Числу 10</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_17" value="2" onchange="userAnswers[17] = 2">
+                            <span>Числу 15</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_17" value="3" onchange="userAnswers[17] = 3">
+                            <span>Числу 4</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">19. Что выведет код: for (int i = 1; i &lt;= 4; i++) { if (i == 3) break; System.out.print(i); }?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_18" value="0" onchange="userAnswers[18] = 0">
+                            <span>Числа 1234</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_18" value="1" onchange="userAnswers[18] = 1">
+                            <span>Числа 124</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_18" value="2" onchange="userAnswers[18] = 2">
+                            <span>Числа 12</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_18" value="3" onchange="userAnswers[18] = 3">
+                            <span>Числа 123</span>
+                        </label>
+                    </div></div><div class="quiz-card"><div class="quiz-q">20. Что выведет код: for (int i = 1; i &lt;= 4; i++) { if (i == 3) continue; System.out.print(i); }?</div><div class="quiz-opts">
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_19" value="0" onchange="userAnswers[19] = 0">
+                            <span>Числа 12</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_19" value="1" onchange="userAnswers[19] = 1">
+                            <span>Числа 123</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_19" value="2" onchange="userAnswers[19] = 2">
+                            <span>Числа 34</span>
+                        </label>
+                    
+                        <label class="quiz-opt">
+                            <input type="radio" name="q_19" value="3" onchange="userAnswers[19] = 3">
+                            <span>Числа 124</span>
+                        </label>
+                    </div></div></div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <button class="btn btn-primary" onclick="submitQuiz()">✅ <span class="lang-ru">Проверить тест</span><span class="lang-kz hidden">Тестті тексеру</span></button>
+                <button class="btn btn-outline" onclick="resetQuiz()">🔄 <span class="lang-ru">Пройти заново</span><span class="lang-kz hidden">Қайта тапсыру</span></button>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+             ВКЛАДКА 5: ОТЧЕТ И СДАЧА (С ПОДДЕРЖКОЙ IPHONE / SAFARI)
+             ========================================================== -->
+        <section id="tab-report" class="tab-content hidden">
+            <div class="grid-12">
+                <div id="print-report-sheet" class="card col-7" style="display:flex; flex-direction:column; gap:14px;">
+                    <h3>📄 <span class="lang-ru">Отчет по Лабораторной работе №6–7 (Java)</span><span class="lang-kz hidden">№6–7 Зертханалық жұмыс бойынша есеп (Java)</span></h3>
+
+                    <div class="grid-2">
+                        <div class="field">
+                            <label><span class="lang-ru">ФИО студента:</span><span class="lang-kz hidden">Студенттің аты-жөні:</span></label>
+                            <input type="text" id="rep-name" class="input" placeholder="Сериков Алихан">
+                        </div>
+                        <div class="field">
+                            <label><span class="lang-ru">Группа:</span><span class="lang-kz hidden">Тобы:</span></label>
+                            <input type="text" id="rep-group" class="input" placeholder="ИС-2501">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label><span class="lang-ru">Результат итогового теста (автозаполнение):</span><span class="lang-kz hidden">Қорытынды тест нәтижесі (автоматты):</span></label>
+                        <input type="text" id="rep-score" class="input input-mono" readonly="" value="Тест еще не пройден / Тест өтілмеген">
+                    </div>
+
+                    <div class="field">
+                        <label><span class="lang-ru">Вывод и ссылка/код по Паре 6 (ПИН-код, Копилка, Ракета):</span><span class="lang-kz hidden">6-жұп бойынша қорытынды және код (ПИН-код, Жинақ, Зымыран):</span></label>
+                        <textarea id="rep-p6" class="textarea" rows="3" placeholder="Проверена блокировка после 3 неверных попыток, реализована копилка до 10000 тг и таймер ракеты..."></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label><span class="lang-ru">Вывод и ссылка/код по Паре 7 (Генератор паролей, Таблица, Кубики):</span><span class="lang-kz hidden">7-жұп бойынша қорытынды және код (Құпия сөз, Кесте, Сүйектер):</span></label>
+                        <textarea id="rep-p7" class="textarea" rows="3" placeholder="Реализован генератор паролей через for + Random, таблица умножения и 10 бросков двух кубиков..."></textarea>
+                    </div>
+
+                    <div class="no-print" style="display:flex; flex-wrap:wrap; gap:8px; padding-top:4px;">
+                        <button class="btn btn-emerald" onclick="copyStudentReport()">📋 <span class="lang-ru">Скопировать текст отчета</span><span class="lang-kz hidden">Есеп мәтінін көшіру</span></button>
+                        <button class="btn btn-primary" onclick="downloadReportHtml()">⬇️ <span class="lang-ru">Скачать отчет (.html)</span><span class="lang-kz hidden">Есепті жүктеу (.html)</span></button>
+                        <button class="btn btn-outline" onclick="window.print()">🖨️ <span class="lang-ru">Печать / PDF</span><span class="lang-kz hidden">Басып шығару / PDF</span></button>
+                    </div>
+                </div>
+
+                <!-- Памятка для iPhone / Safari -->
+                <div class="col-5 no-print">
+                    <div class="callout callout-amber" style="margin-top:0;">
+                        <span class="callout-title">🍎 <span class="lang-ru">Как сохранить PDF на iPhone (Safari):</span><span class="lang-kz hidden">iPhone-да (Safari) PDF сақтау жолы:</span></span>
+                        <ol class="nice-list" style="margin-top:8px;">
+                            <li><span class="lang-ru">Нажмите кнопку <strong>«Печать / PDF»</strong> слева (или кнопку <strong>«Поделиться»</strong> внизу Safari → <strong>«Напечатать»</strong>).</span><span class="lang-kz hidden">Сол жақтағы <strong>«Басып шығару / PDF»</strong> батырмасын (немесе Safari төменіндегі <strong>«Бөлісу» → «Басып шығару»</strong>) басыңыз.</span></li>
+                            <li><span class="lang-ru">В окне предпросмотра <strong>разведите двумя пальцами</strong> страницу — она откроется как готовый PDF.</span><span class="lang-kz hidden">Алдын ала қарау терезесінде бетті <strong>екі саусақпен үлкейтіңіз</strong> — ол дайын PDF-ке айналады.</span></li>
+                            <li><span class="lang-ru">Нажмите «Поделиться» → <strong>«Сохранить в Файлы»</strong> или сразу отправьте в чат преподавателю.</span><span class="lang-kz hidden">«Бөлісу» → <strong>«Файлдарға сақтау»</strong> батырмасын басыңыз немесе оқытушыға жіберіңіз.</span></li>
+                        </ol>
+                        <p style="margin-top:10px; font-size:12px; color:var(--text-muted);">
+                            💡 <span class="lang-ru">Самый быстрый способ с телефона: нажмите <strong>«Скопировать текст отчета»</strong> и вставьте прямо в Telegram/WhatsApp.</span>
+                            <span class="lang-kz hidden">Телефоннан ең жылдам әдіс: <strong>«Есеп мәтінін көшіру»</strong> батырмасын басып, чатқа жіберіңіз.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="no-print">
+        <span class="lang-ru">Java Практикум • Лабораторная работа №6–7 (Циклы while, do-while, for и Random) • Автономный файл • RU / KZ</span>
+        <span class="lang-kz hidden">Java Практикумы • №6–7 Зертханалық жұмыс (while, do-while, for циклдері және Random) • Автономды файл • RU / KZ</span>
+    </footer>
+
+    <script>
+        /* =========================================================
+           ГЛОБАЛЬНОЕ СОСТОЯНИЕ И ДАННЫЕ 20 ВОПРОСОВ ТЕСТА
+           ========================================================= */
+        let currentLang = 'ru';
+        let quizSubmitted = false;
+        let userAnswers = new Array(20).fill(null);
+
+        // Пошаговый симулятор лекции
+        let stepCounter = 0;
+        let stepLogs = [];
+        let stepDone = false;
+
+        // Симулятор 6.1 (ПИН + Копилка)
+        let simPinAttempts = 0;
+        let simPinLocked = false;
+        let simPinUnlocked = false;
+        let simBankSaved = 0;
+        let sim61Logs = [];
+
+        // Таймер ракеты 6.2
+        let rocketInterval = null;
+
+        // 20 вопросов (равномерно по 5 правильных ответов на индексы 0, 1, 2, 3; одинаковый стиль и длина)
+        const QUIZ_DATA = [
+            {
+                ru: "1. Когда проверяется условие продолжения работы в цикле while?",
+                kz: "1. while циклінде жұмысты жалғастыру шарты қашан тексеріледі?",
+                optsRu: ["Перед началом каждой итерации", "После завершения каждой итерации", "Только один раз в самом конце", "После выполнения оператора break"],
+                optsKz: ["Әр итерация басталар алдында", "Әр итерация аяқталғаннан кейін", "Ең соңында тек бір рет қана", "break операторы орындалған соң"],
+                ans: 0
+            },
+            {
+                ru: "2. Чем цикл do-while принципиально отличается от обычного цикла while?",
+                kz: "2. do-while циклінің қарапайым while циклінен басты айырмашылығы неде?",
+                optsRu: ["Он не поддерживает оператор break", "Он выполняется хотя бы один раз", "Он работает только со строками", "Он не требует условия в скобках"],
+                optsKz: ["Ол break операторын қолдамайды", "Ол кем дегенде бір рет орындалады", "Ол тек жолдармен ғана жұмыс істейді", "Ол жақша ішінде шартты талап етпейді"],
+                ans: 1
+            },
+            {
+                ru: "3. Что произойдет, если в цикле while (energy > 0) забыть уменьшать переменную energy?",
+                kz: "3. Егер while (energy > 0) циклінде energy айнымалысын азайтуды ұмытса не болады?",
+                optsRu: ["Цикл завершится после первого шага", "Компилятор выдаст ошибку синтаксиса", "Программа попадет в бесконечный цикл", "Переменная energy обнулится сама"],
+                optsKz: ["Цикл бірінші қадамнан соң аяқталады", "Компилятор синтаксис қатесін береді", "Бағдарлама шексіз циклге түседі", "energy айнымалысы өзі нөлге айналады"],
+                ans: 2
+            },
+            {
+                ru: "4. Какой оператор немедленно прерывает выполнение цикла и выходит из него?",
+                kz: "4. Қандай оператор циклдің орындалуын дереу тоқтатып, одан шығады?",
+                optsRu: ["Оператор continue", "Оператор default", "Оператор switch", "Оператор break"],
+                optsKz: ["continue операторы", "default операторы", "switch операторы", "break операторы"],
+                ans: 3
+            },
+            {
+                ru: "5. Что делает оператор continue внутри тела цикла?",
+                kz: "5. Цикл денесінің ішіндегі continue операторы не істейді?",
+                optsRu: ["Пропускает остаток шага к следующему", "Полностью останавливает весь цикл", "Сбрасывает счетчик цикла в ноль", "Завершает работу метода main"],
+                optsKz: ["Қадамның қалғанын өткізіп келесіге өтеді", "Бүкіл циклді толығымен тоқтатады", "Цикл санағышын нөлге түсіреді", "main әдісінің жұмысын аяқтайды"],
+                ans: 0
+            },
+            {
+                ru: "6. Сколько раз выполнится цикл: for (int i = 1; i <= 5; i++)?",
+                kz: "6. for (int i = 1; i <= 5; i++) циклі неше рет орындалады?",
+                optsRu: ["Ровно 4 раза", "Ровно 5 раз", "Ровно 6 раз", "Ни одного раза"],
+                optsKz: ["Дәл 4 рет", "Дәл 5 рет", "Дәл 6 рет", "Бірде-бір рет емес"],
+                ans: 1
+            },
+            {
+                ru: "7. Сколько раз выполнится цикл: for (int i = 0; i < 10; i++)?",
+                kz: "7. for (int i = 0; i < 10; i++) циклі неше рет орындалады?",
+                optsRu: ["Ровно 9 раз", "Ровно 11 раз", "Ровно 10 раз", "Бесконечно много раз"],
+                optsKz: ["Дәл 9 рет", "Дәл 11 рет", "Дәл 10 рет", "Шексіз көп рет"],
+                ans: 2
+            },
+            {
+                ru: "8. Какой диапазон целых чисел возвращает метод rand.nextInt(6)?",
+                kz: "8. rand.nextInt(6) әдісі бүтін сандардың қандай диапазонын қайтарады?",
+                optsRu: ["От 1 до 6 включительно", "От 0 до 6 включительно", "От 1 до 5 включительно", "От 0 до 5 включительно"],
+                optsKz: ["1-ден 6-ға дейін қоса", "0-ден 6-ға дейін қоса", "1-ден 5-ке дейін қоса", "0-ден 5-ке дейін қоса"],
+                ans: 3
+            },
+            {
+                ru: "9. Как правильно получить случайное число от 1 до 6 (как на игральном кубике)?",
+                kz: "9. 1-ден 6-ға дейінгі кездейсоқ санды (ойын сүйегі сияқты) қалай дұрыс алуға болады?",
+                optsRu: ["rand.nextInt(6) + 1", "rand.nextInt(5) + 1", "rand.nextInt(7)", "rand.nextInt(6) - 1"],
+                optsKz: ["rand.nextInt(6) + 1", "rand.nextInt(5) + 1", "rand.nextInt(7)", "rand.nextInt(6) - 1"],
+                ans: 0
+            },
+            {
+                ru: "10. Какой пакет нужно импортировать в начале файла для работы с классом Random?",
+                kz: "10. Random класымен жұмыс істеу үшін файл басында қай пакетті импорттау керек?",
+                optsRu: ["import java.io.Random;", "import java.util.Random;", "import java.lang.Random;", "import java.math.Random;"],
+                optsKz: ["import java.io.Random;", "import java.util.Random;", "import java.lang.Random;", "import java.math.Random;"],
+                ans: 1
+            },
+            {
+                ru: "11. Что выведет код: int i = 3; while (i > 0) { System.out.print(i); i--; }?",
+                kz: "11. int i = 3; while (i > 0) { System.out.print(i); i--; } коды не шығарады?",
+                optsRu: ["Числа 123", "Числа 3210", "Числа 321", "Числа 210"],
+                optsKz: ["123 сандарын", "3210 сандарын", "321 сандарын", "210 сандарын"],
+                ans: 2
+            },
+            {
+                ru: "12. Сколько раз выполнится тело цикла: int x = 10; while (x < 5) { x++; }?",
+                kz: "12. int x = 10; while (x < 5) { x++; } циклінің денесі неше рет орындалады?",
+                optsRu: ["Ровно 5 раз", "Ровно 1 раз", "Ровно 10 раз", "Ноль раз (не запустится)"],
+                optsKz: ["Дәл 5 рет", "Дәл 1 рет", "Дәл 10 рет", "Нөл рет (іске қосылмайды)"],
+                ans: 3
+            },
+            {
+                ru: "13. Сколько раз выполнится цикл: int x = 10; do { x++; } while (x < 5);?",
+                kz: "13. int x = 10; do { x++; } while (x < 5); циклі неше рет орындалады?",
+                optsRu: ["Ровно 1 раз", "Ноль раз", "Ровно 5 раз", "Бесконечно раз"],
+                optsKz: ["Дәл 1 рет", "Нөл рет", "Дәл 5 рет", "Шексіз рет"],
+                ans: 0
+            },
+            {
+                ru: "14. Что означает запись i += 2 в заголовке цикла for (int i = 0; i <= 6; i += 2)?",
+                kz: "14. for (int i = 0; i <= 6; i += 2) тақырыбындағы i += 2 жазбасы нені білдіреді?",
+                optsRu: ["Умножает i на 2 на каждом шаге", "Увеличивает i на 2 на каждом шаге", "Уменьшает i на 2 на каждом шаге", "Присваивает i число 2 один раз"],
+                optsKz: ["Әр қадамда i-ді 2-ге көбейтеді", "Әр қадамда i-ді 2-ге арттырады", "Әр қадамда i-ді 2-ге азайтады", "i-ге 2 санын бір рет меншіктейді"],
+                ans: 1
+            },
+            {
+                ru: "15. В задаче о копилке: какое условие держит цикл открытым, пока не набрано 10 000 тг?",
+                kz: "15. Жинақ сандығы есебінде 10 000 тг жиналғанша циклді қай шарт ұстап тұрады?",
+                optsRu: ["while (saved > 10000)", "while (saved == 10000)", "while (saved < 10000)", "while (saved != 0)"],
+                optsKz: ["while (saved > 10000)", "while (saved == 10000)", "while (saved < 10000)", "while (saved != 0)"],
+                ans: 2
+            },
+            {
+                ru: "16. В задаче о двух кубиках d1 и d2: какое условие проверяет, что выпал дубль?",
+                kz: "16. Екі ойын сүйегі d1 және d2 есебінде дубль түскенін қай шарт тексереді?",
+                optsRu: ["if (d1 + d2 == 12)", "if (d1 != d2)", "if (d1 > d2)", "if (d1 == d2)"],
+                optsKz: ["if (d1 + d2 == 12)", "if (d1 != d2)", "if (d1 > d2)", "if (d1 == d2)"],
+                ans: 3
+            },
+            {
+                ru: "17. Как получить случайное число от 10 до 20 включительно через Random?",
+                kz: "17. Random арқылы 10-нан 20-ға дейінгі (қоса алғанда) кездейсоқ санды қалай алады?",
+                optsRu: ["rand.nextInt(11) + 10", "rand.nextInt(10) + 10", "rand.nextInt(20) + 10", "rand.nextInt(10) + 11"],
+                optsKz: ["rand.nextInt(11) + 10", "rand.nextInt(10) + 10", "rand.nextInt(20) + 10", "rand.nextInt(10) + 11"],
+                ans: 0
+            },
+            {
+                ru: "18. Чему будет равна сумма s после цикла: int s = 0; for (int i = 1; i <= 4; i++) { s += i; }?",
+                kz: "18. int s = 0; for (int i = 1; i <= 4; i++) { s += i; } циклінен кейін s қосындысы неге тең?",
+                optsRu: ["Числу 6", "Числу 10", "Числу 15", "Числу 4"],
+                optsKz: ["6 санына", "10 санына", "15 санына", "4 санына"],
+                ans: 1
+            },
+            {
+                ru: "19. Что выведет код: for (int i = 1; i <= 4; i++) { if (i == 3) break; System.out.print(i); }?",
+                kz: "19. for (int i = 1; i <= 4; i++) { if (i == 3) break; System.out.print(i); } коды не шығарады?",
+                optsRu: ["Числа 1234", "Числа 124", "Числа 12", "Числа 123"],
+                optsKz: ["1234 сандарын", "124 сандарын", "12 сандарын", "123 сандарын"],
+                ans: 2
+            },
+            {
+                ru: "20. Что выведет код: for (int i = 1; i <= 4; i++) { if (i == 3) continue; System.out.print(i); }?",
+                kz: "20. for (int i = 1; i <= 4; i++) { if (i == 3) continue; System.out.print(i); } коды не шығарады?",
+                optsRu: ["Числа 12", "Числа 123", "Числа 34", "Числа 124"],
+                optsKz: ["12 сандарын", "123 сандарын", "34 сандарын", "124 сандарын"],
+                ans: 3
+            }
+        ];
+
+        /* =========================================================
+           НАВИГАЦИЯ, ЯЗЫК, ТЕМА, TOAST, КОПИРОВАНИЕ
+           ========================================================= */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const active = document.getElementById('btn-' + tabId);
+            if (active) active.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('java_lab67_lang', lang);
+
+            document.querySelectorAll('.lang-ru').forEach(el => el.classList.toggle('hidden', lang === 'kz'));
+            document.querySelectorAll('.lang-kz').forEach(el => el.classList.toggle('hidden', lang === 'ru'));
+
+            document.getElementById('lang-btn-ru').classList.toggle('active', lang === 'ru');
+            document.getElementById('lang-btn-kz').classList.toggle('active', lang === 'kz');
+
+            renderStepSim();
+            renderSim61();
+            updateMultTable();
+            renderQuiz();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.getElementById('theme-btn');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                btn.textContent = '🌙';
+                localStorage.setItem('java_lab67_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('java_lab67_theme', 'dark');
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function copyTextToClipboard(text, msg) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            const range = document.createRange();
+            range.selectNodeContents(ta);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            ta.setSelectionRange(0, 999999);
+            try {
+                document.execCommand('copy');
+                showToast(msg || (currentLang === 'kz' ? 'Буферге көшірілді!' : 'Скопировано в буфер!'));
+            } catch (e) {
+                showToast('Ошибка копирования');
+            }
+            document.body.removeChild(ta);
+        }
+
+        function copyCode(id) {
+            const el = document.getElementById(id);
+            if (el) copyTextToClipboard(el.textContent);
+        }
+
+        /* =========================================================
+           СИМУЛЯТОР 1: ПОШАГОВЫЙ ЦИКЛ (ЛЕКЦИЯ)
+           ========================================================= */
+        function resetStepSim() {
+            stepCounter = 0;
+            stepLogs = [];
+            stepDone = false;
+            renderStepSim();
+        }
+
+        function nextLoopStep() {
+            const type = document.getElementById('step-type').value;
+            const max = Math.max(1, Math.min(8, parseInt(document.getElementById('step-max').value) || 4));
+            if (stepDone) {
+                showToast(currentLang === 'kz' ? 'Цикл аяқталды! «Тазарту» басыңыз.' : 'Цикл завершен! Нажмите «Сброс».');
+                return;
+            }
+            stepCounter++;
+            if (type === 'for') {
+                if (stepCounter <= max) {
+                    stepLogs.push(`Итерация #${stepCounter}: i = ${stepCounter} (${stepCounter} <= ${max} -> true) | Бежим круг #${stepCounter}, затем i++`);
+                } else {
+                    stepLogs.push(`Проверка: i = ${stepCounter} (${stepCounter} <= ${max} -> false) -> ВЫХОД ИЗ ЦИКЛА!`);
+                    stepDone = true;
+                }
+            } else {
+                const energy = max - (stepCounter - 1);
+                if (energy > 0) {
+                    stepLogs.push(`Итерация #${stepCounter}: energy = ${energy} (${energy} > 0 -> true) | Делаем повтор, затем energy-- (станет ${energy - 1})`);
+                } else {
+                    stepLogs.push(`Проверка: energy = 0 (0 > 0 -> false) -> ВЫХОД ИЗ ЦИКЛА!`);
+                    stepDone = true;
+                }
+            }
+            renderStepSim();
+        }
+
+        function renderStepSim() {
+            const out = document.getElementById('step-output');
+            if (stepLogs.length === 0) {
+                out.textContent = currentLang === 'kz'
+                    ? '> Циклді қадамдап көру үшін «Келесі қадам» батырмасын басыңыз...'
+                    : '> Нажмите «Следующий шаг», чтобы прогнать цикл пошагово...';
+            } else {
+                out.textContent = stepLogs.join('\n');
+            }
+        }
+
+        /* =========================================================
+           СИМУЛЯТОР 6.1: ПИН-КОД (3 ПОПЫТКИ) И КОПИЛКА (10 000 ТГ)
+           ========================================================= */
+        function resetSim61() {
+            simPinAttempts = 0;
+            simPinLocked = false;
+            simPinUnlocked = false;
+            simBankSaved = 0;
+            sim61Logs = [];
+            document.getElementById('sim61-pin').value = '';
+            document.getElementById('sim61-pin-stage').classList.remove('hidden');
+            document.getElementById('sim61-bank-stage').classList.add('hidden');
+            renderSim61();
+        }
+
+        function checkSimPin() {
+            if (simPinLocked || simPinUnlocked) return;
+            const pin = parseInt(document.getElementById('sim61-pin').value);
+            simPinAttempts++;
+
+            if (pin === 7777) {
+                simPinUnlocked = true;
+                sim61Logs.push(`✅ Попытка ${simPinAttempts}: ПИН верный (7777)! Доступ открыт (break).`);
+                sim61Logs.push(`💰 Запуск копилки: цель 10 000 тг.`);
+                document.getElementById('sim61-pin-stage').classList.add('hidden');
+                document.getElementById('sim61-bank-stage').classList.remove('hidden');
+            } else {
+                const left = 3 - simPinAttempts;
+                if (left > 0) {
+                    sim61Logs.push(`❌ Попытка ${simPinAttempts}: Неверный ПИН (${isNaN(pin) ? 'пусто' : pin}). Осталось попыток: ${left}`);
+                } else {
+                    simPinLocked = true;
+                    sim61Logs.push(`🔒 Попытка 3: Неверный ПИН! КАРТА ЗАБЛОКИРОВАНА!`);
+                }
+            }
+            renderSim61();
+        }
+
+        function addPiggyDeposit() {
+            if (!simPinUnlocked || simBankSaved >= 10000) return;
+            const dep = parseInt(document.getElementById('sim61-deposit').value) || 0;
+            if (dep <= 0) return;
+            simBankSaved += dep;
+            sim61Logs.push(`+ Внесено ${dep} тг | Накоплено: ${simBankSaved} / 10000 тг`);
+            if (simBankSaved >= 10000) {
+                sim61Logs.push(`🎉 ЦЕЛЬ ДОСТИГНУТА! Выход из while. Итого: ${simBankSaved} тг.`);
+            }
+            renderSim61();
+        }
+
+        function renderSim61() {
+            const pct = Math.min(100, Math.round((simBankSaved / 10000) * 100));
+            document.getElementById('sim61-progress').style.width = pct + '%';
+            document.getElementById('sim61-bank-label').textContent = `${simBankSaved} / 10 000 тг (${pct}%)`;
+            const box = document.getElementById('sim61-console');
+            if (sim61Logs.length === 0) {
+                box.textContent = currentLang === 'kz'
+                    ? '> ПИН-кодты енгізіңіз (дұрысы: 7777). 3 рет қате енгізіп бұғаттауды тексеріңіз!'
+                    : '> Введите ПИН-код (верный: 7777). Попробуйте ввести неверный 3 раза для проверки блокировки!';
+            } else {
+                box.textContent = sim61Logs.join('\n');
+            }
+        }
+
+        /* =========================================================
+           СИМУЛЯТОР 6.2: ТАЙМЕР РАКЕТЫ
+           ========================================================= */
+        function launchRocket() {
+            if (rocketInterval) clearInterval(rocketInterval);
+            let count = 10;
+            const numEl = document.getElementById('rocket-num');
+            const stEl = document.getElementById('rocket-status');
+            numEl.textContent = count;
+            stEl.textContent = 'while (count >= 1) { count--; }';
+
+            rocketInterval = setInterval(() => {
+                count--;
+                if (count >= 1) {
+                    numEl.textContent = count;
+                } else {
+                    clearInterval(rocketInterval);
+                    numEl.textContent = currentLang === 'kz' ? 'КЕТТІК! 🚀' : 'ПОЕХАЛИ! 🚀';
+                    stEl.textContent = 'count == 0 -> выход из while';
+                }
+            }, 350);
+        }
+
+        /* =========================================================
+           СИМУЛЯТОР 7.1: ПАРОЛЬ И ТАБЛИЦА УМНОЖЕНИЯ
+           ========================================================= */
+        function generateSimPassword() {
+            const len = Math.max(4, Math.min(24, parseInt(document.getElementById('pass-len').value) || 12));
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+            let pass = '';
+            for (let i = 0; i < len; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('pass-output').textContent = `Password (${len} chars): ${pass}`;
+        }
+
+        function updateMultTable() {
+            const n = parseInt(document.getElementById('mult-n').value) || 0;
+            let lines = [];
+            for (let i = 1; i <= 10; i++) {
+                lines.push(`${n} x ${i} = ${n * i}`);
+            }
+            document.getElementById('mult-output').textContent = lines.join('\n');
+        }
+
+        /* =========================================================
+           СИМУЛЯТОР 7.2: 10 БРОСКОВ ДВУХ КУБИКОВ
+           ========================================================= */
+        function rollDice10() {
+            const container = document.getElementById('dice-results');
+            const faces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            let doubles = 0;
+            let html = '';
+
+            for (let i = 1; i <= 10; i++) {
+                const d1 = Math.floor(Math.random() * 6) + 1;
+                const d2 = Math.floor(Math.random() * 6) + 1;
+                const isDbl = d1 === d2;
+                if (isDbl) doubles++;
+                html += `<div class="dice-item ${isDbl ? 'double' : ''}">
+                    #${i}: ${faces[d1]}[${d1}] + ${faces[d2]}[${d2}] = <strong>${d1 + d2}</strong> ${isDbl ? '✨' : ''}
+                </div>`;
+            }
+            container.innerHTML = html;
+            document.getElementById('dice-summary').textContent = currentLang === 'kz'
+                ? `Барлығы 10 лақтыру орындалды | Дубль саны: ${doubles}`
+                : `Выполнено 10 бросков | Всего выпало дублей: ${doubles}`;
+        }
+
+        /* =========================================================
+           ИТОГОВЫЙ ТЕСТ (20 ВОПРОСОВ)
+           ========================================================= */
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = QUIZ_DATA.map((q, qIdx) => {
+                const qText = currentLang === 'kz' ? q.kz : q.ru;
+                const opts = currentLang === 'kz' ? q.optsKz : q.optsRu;
+                let cardCls = 'quiz-card';
+                if (quizSubmitted) {
+                    cardCls += userAnswers[qIdx] === q.ans ? ' q-correct' : ' q-wrong';
+                }
+
+                const optsHtml = opts.map((opt, oIdx) => {
+                    const checked = userAnswers[qIdx] === oIdx ? 'checked' : '';
+                    let optCls = 'quiz-opt';
+                    if (quizSubmitted) {
+                        if (oIdx === q.ans) optCls += ' opt-right';
+                        else if (userAnswers[qIdx] === oIdx && oIdx !== q.ans) optCls += ' opt-wrong';
+                    }
+                    return `
+                        <label class="${optCls}">
+                            <input type="radio" name="q_${qIdx}" value="${oIdx}" ${checked} ${quizSubmitted ? 'disabled' : ''} onchange="userAnswers[${qIdx}] = ${oIdx}">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                }).join('');
+
+                return `<div class="${cardCls}"><div class="quiz-q">${qText}</div><div class="quiz-opts">${optsHtml}</div></div>`;
+            }).join('');
+        }
+
+        function submitQuiz() {
+            let correct = 0;
+            QUIZ_DATA.forEach((q, i) => { if (userAnswers[i] === q.ans) correct++; });
+            quizSubmitted = true;
+            const pct = Math.round((correct / QUIZ_DATA.length) * 100);
+            const scoreStr = `${correct} / ${QUIZ_DATA.length} (${pct}%)`;
+
+            const badge = document.getElementById('test-score-badge');
+            badge.textContent = scoreStr;
+            badge.className = pct >= 70 ? 'badge badge-emerald' : 'badge badge-amber';
+            badge.style.fontSize = '14px';
+            badge.style.padding = '8px 14px';
+
+            document.getElementById('rep-score').value = scoreStr;
+            renderQuiz();
+            showToast((currentLang === 'kz' ? 'Тест нәтижесі: ' : 'Результат теста: ') + scoreStr);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            quizSubmitted = false;
+            userAnswers = new Array(20).fill(null);
+            const badge = document.getElementById('test-score-badge');
+            badge.className = 'badge badge-indigo';
+            badge.innerHTML = '<span class="lang-ru">Не завершен</span><span class="lang-kz hidden">Аяқталмаған</span>';
+            document.getElementById('rep-score').value = 'Тест еще не пройден / Тест өтілмеген';
+            setLanguage(currentLang);
+        }
+
+        /* =========================================================
+           ЭКСПОРТ ОТЧЕТА И СКАЧИВАНИЕ HTML
+           ========================================================= */
+        function copyStudentReport() {
+            const name = document.getElementById('rep-name').value || 'Не указано';
+            const group = document.getElementById('rep-group').value || 'Не указана';
+            const score = document.getElementById('rep-score').value;
+            const p6 = document.getElementById('rep-p6').value || '—';
+            const p7 = document.getElementById('rep-p7').value || '—';
+
+            const txt =
+`ОТЧЕТ ПО ЛАБОРАТОРНОЙ РАБОТЕ №6-7 (Java: Циклы и Random)
+=========================================================
+Студент: ${name}
+Группа:  ${group}
+Итоговый тест: ${score}
+
+1. Вывод по Паре 6 (while, do-while, ПИН-код, Копилка, Ракета):
+${p6}
+
+2. Вывод по Паре 7 (for, Random, Пароли, Таблица, Кубики):
+${p7}
+=========================================================`;
+            copyTextToClipboard(txt, currentLang === 'kz' ? 'Есеп көшірілді!' : 'Отчет скопирован!');
+        }
+
+        function downloadReportHtml() {
+            const name = document.getElementById('rep-name').value || 'Student';
+            const group = document.getElementById('rep-group').value || 'Group';
+            const score = document.getElementById('rep-score').value;
+            const p6 = document.getElementById('rep-p6').value || '—';
+            const p7 = document.getElementById('rep-p7').value || '—';
+
+            const html = `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Отчет Java №6-7 — ${name}</title><style>body{font-family:Arial,sans-serif;max-width:760px;margin:28px auto;padding:18px;color:#111;line-height:1.6}h1{font-size:20px;border-bottom:2px solid #4f46e5;padding-bottom:8px}.box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:14px;margin:14px 0}</style></head><body><h1>Отчет по Лабораторной работе №6–7 (Java: Циклы и Random)</h1><div class="box"><strong>Студент:</strong> ${name}<br><strong>Группа:</strong> ${group}<br><strong>Итоговый тест:</strong> ${score}</div><div class="box"><strong>Пара 6 (while, do-while):</strong><br>${p6}</div><div class="box"><strong>Пара 7 (for, Random):</strong><br>${p7}</div></body></html>`;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Report_Java_Lab6_7_${name.replace(/\s+/g, '_')}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(currentLang === 'kz' ? 'Есеп файлы жүктелді!' : 'Файл отчета (.html) скачан!');
+        }
+
+        function downloadThisHtml() {
+            const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Java_Lab_6_7_Loops_Random_RU_KZ.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(currentLang === 'kz' ? 'HTML файл жүктелді!' : 'Файл Java_Lab_6_7_Loops_Random_RU_KZ.html скачан!');
+        }
+
+        /* =========================================================
+           ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+           ========================================================= */
+        window.onload = function () {
+            if (localStorage.getItem('java_lab67_theme') === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-btn').textContent = '🌙';
+            }
+            const savedLang = localStorage.getItem('java_lab67_lang') || 'ru';
+            setLanguage(savedLang);
+            generateSimPassword();
+            rollDice10();
+        };
+    </script>
+
+</body></html>
